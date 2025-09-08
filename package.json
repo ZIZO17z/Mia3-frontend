@@ -9,7 +9,8 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "export": "next export"
+    "export": "next export",
+    "deploy-check": "node deploy-check.js"
   },
   "dependencies": {
     "@livekit/components-react": "^2.9.14",

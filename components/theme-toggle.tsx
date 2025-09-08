@@ -3,9 +3,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MonitorIcon, MoonIcon, SunIcon } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { ThemeMode } from '@/lib/types';
 import { THEME_MEDIA_QUERY, THEME_STORAGE_KEY, cn } from '@/lib/utils';
 
@@ -75,8 +73,7 @@ export function ThemeToggle({
   className,
   variant = 'outline',
   size = 'default',
-  showLabels = false,
-}: ThemeToggleProps) {
+}: Omit<ThemeToggleProps, 'showLabels'>) {
   const [theme, setTheme] = useState<ThemeMode>('system');
   const [mounted, setMounted] = useState(false);
 
@@ -91,81 +88,20 @@ export function ThemeToggle({
     setTheme(newTheme);
   };
 
-  const themes = [
-    { value: 'dark' as const, icon: MoonIcon, label: 'Dark theme' },
-    { value: 'light' as const, icon: SunIcon, label: 'Light theme' },
-    { value: 'system' as const, icon: MonitorIcon, label: 'System theme' },
-  ];
-
   if (!mounted) {
-    // Skeleton state while mounting
-    return (
-      <div className={cn('flex items-center gap-1', className)}>
-        {themes.map(({ value, icon: Icon, label }) => (
-          <Button
-            key={value}
-            variant={variant}
-            size={size}
-            disabled
-            className="opacity-50"
-            aria-label={label}
-          >
-            <Icon size={18} weight="bold" />
-            {showLabels && <span className="ml-2">{label}</span>}
-          </Button>
-        ))}
-      </div>
-    );
+    return <div className={cn('opacity-50', className)} />;
   }
 
   return (
-    <TooltipProvider delayDuration={150}>
-      <div
-        className={cn('flex items-center gap-2', className)}
-        role="group"
-        aria-label="Theme toggle"
+    <div className={cn('flex items-center gap-2', className)}>
+      <Button
+        variant={variant}
+        size={size}
+        onClick={() => handleThemeChange(theme === 'dark' ? 'light' : 'dark')}
+        aria-label="Toggle theme"
       >
-        <span className="sr-only">Color scheme toggle</span>
-
-        {themes.map(({ value, icon: Icon, label }) => (
-          <Tooltip key={value}>
-            <TooltipTrigger asChild>
-              <Button
-                variant={theme === value ? 'default' : variant}
-                size={size}
-                onClick={() => handleThemeChange(value)}
-                className={cn(
-                  theme !== value && 'text-muted-foreground',
-                  'focus-visible:ring-primary relative transition-all duration-300 ease-in-out focus-visible:ring-2'
-                )}
-                aria-pressed={theme === value}
-                aria-label={label}
-              >
-                <Icon
-                  size={18}
-                  weight="bold"
-                  className={cn(
-                    theme === value
-                      ? 'text-primary drop-shadow-glow scale-125 rotate-6'
-                      : 'scale-100 opacity-75',
-                    'transition-transform duration-300 ease-in-out'
-                  )}
-                />
-                {showLabels && <span className="ml-2 text-xs font-medium">{label}</span>}
-                {/* subtle glow effect when active */}
-                {theme === value && (
-                  <span className="ring-primary/40 pointer-events-none absolute inset-0 animate-pulse rounded-md ring-2" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            {!showLabels && (
-              <TooltipContent side="bottom" sideOffset={6}>
-                <p>{label}</p>
-              </TooltipContent>
-            )}
-          </Tooltip>
-        ))}
-      </div>
-    </TooltipProvider>
+        {theme === 'dark' ? '☀️' : '🌙'}
+      </Button>
+    </div>
   );
 }
