@@ -19,18 +19,33 @@ export type ConnectionDetails = {
 
 export async function POST(req: Request) {
   try {
-    if (LIVEKIT_URL === undefined) {
-      throw new Error('LIVEKIT_URL is not defined');
+    // Validate environment variables
+    if (!LIVEKIT_URL) {
+      console.error('Missing LIVEKIT_URL environment variable');
+      return new NextResponse('Server configuration error: Missing LIVEKIT_URL', { status: 500 });
     }
-    if (API_KEY === undefined) {
-      throw new Error('LIVEKIT_API_KEY is not defined');
+    if (!API_KEY) {
+      console.error('Missing LIVEKIT_API_KEY environment variable');
+      return new NextResponse('Server configuration error: Missing LIVEKIT_API_KEY', {
+        status: 500,
+      });
     }
-    if (API_SECRET === undefined) {
-      throw new Error('LIVEKIT_API_SECRET is not defined');
+    if (!API_SECRET) {
+      console.error('Missing LIVEKIT_API_SECRET environment variable');
+      return new NextResponse('Server configuration error: Missing LIVEKIT_API_SECRET', {
+        status: 500,
+      });
     }
 
-    // Parse agent configuration from request body
-    const body = await req.json();
+    // Parse agent configuration from request body with error handling
+    let body;
+    try {
+      body = await req.json();
+    } catch (parseError) {
+      console.error('Invalid JSON in request body:', parseError);
+      return new NextResponse('Invalid request body', { status: 400 });
+    }
+
     const agentName: string = body?.room_config?.agents?.[0]?.agent_name;
 
     // Generate participant token
@@ -56,10 +71,16 @@ export async function POST(req: Request) {
     });
     return NextResponse.json(data, { headers });
   } catch (error) {
+    console.error('Connection details API error:', error);
+
     if (error instanceof Error) {
-      console.error(error);
-      return new NextResponse(error.message, { status: 500 });
+      // Don't expose internal error details in production
+      const errorMessage =
+        process.env.NODE_ENV === 'development' ? error.message : 'Internal server error';
+      return new NextResponse(errorMessage, { status: 500 });
     }
+
+    return new NextResponse('Unknown server error', { status: 500 });
   }
 }
 

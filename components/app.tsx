@@ -14,6 +14,10 @@ import { Welcome } from '@/components/welcome';
 import useConnectionDetails from '@/hooks/useConnectionDetails';
 import type { AppConfig } from '@/lib/types';
 
+// app.tsx
+
+// app.tsx
+
 const MotionWelcome = motion(Welcome);
 const MotionSessionView = motion(SessionView);
 

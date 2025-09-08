@@ -9,6 +9,10 @@ import { toastAlert } from '@/components/alert-toast';
 import useConnectionDetails from '@/hooks/useConnectionDetails';
 import type { AppConfig } from '@/lib/types';
 
+// provider.tsx
+
+// provider.tsx
+
 export function Provider({
   appConfig,
   children,

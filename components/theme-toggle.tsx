@@ -9,6 +9,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import type { ThemeMode } from '@/lib/types';
 import { THEME_MEDIA_QUERY, THEME_STORAGE_KEY, cn } from '@/lib/utils';
 
+// components/theme-toggle.tsx
+
+// components/theme-toggle.tsx
+
 const THEME_SCRIPT = `
   (function() {
     const doc = document.documentElement;

@@ -6,6 +6,10 @@ import { type HTMLAttributes, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
+// VoiceBall.tsx
+
+// VoiceBall.tsx
+
 interface VoiceBallProps extends HTMLAttributes<HTMLDivElement> {
   isActive?: boolean;
 }
