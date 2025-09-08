@@ -24,7 +24,6 @@ export default function useConnectionDetails(appConfig: AppConfig) {
       window.location.origin
     );
 
-    let data: ConnectionDetails;
     try {
       const res = await fetch(url.toString(), {
         method: 'POST',
@@ -40,15 +39,27 @@ export default function useConnectionDetails(appConfig: AppConfig) {
             : undefined,
         }),
       });
-      data = await res.json();
+
+      if (!res.ok) {
+        // Try to read error body if available, but keep message concise
+        let reason = `${res.status} ${res.statusText}`;
+        try {
+          const text = await res.text();
+          if (text) reason += ` - ${text}`;
+        } catch {}
+        throw new Error(`Failed to fetch connection details: ${reason}`);
+      }
+
+      const data: ConnectionDetails = await res.json();
+      setConnectionDetails(data);
+      return data;
     } catch (error) {
       console.error('Error fetching connection details:', error);
-      throw new Error('Error fetching connection details!');
+      throw error instanceof Error
+        ? error
+        : new Error('Error fetching connection details!');
     }
-
-    setConnectionDetails(data);
-    return data;
-  }, []);
+  }, [appConfig.agentName, appConfig.sandboxId]);
 
   useEffect(() => {
     fetchConnectionDetails();
@@ -56,26 +67,22 @@ export default function useConnectionDetails(appConfig: AppConfig) {
 
   const isConnectionDetailsExpired = useCallback(() => {
     const token = connectionDetails?.participantToken;
-    if (!token) {
-      return true;
-    }
+    if (!token) return true;
 
     const jwtPayload = decodeJwt(token);
-    if (!jwtPayload.exp) {
-      return true;
-    }
-    const expiresAt = new Date(jwtPayload.exp - ONE_MINUTE_IN_MILLISECONDS);
+    if (!jwtPayload.exp) return true;
 
+    // exp is in seconds; convert to ms and subtract a safety buffer
+    const expiresAt = new Date(jwtPayload.exp * 1000 - ONE_MINUTE_IN_MILLISECONDS);
     const now = new Date();
-    return expiresAt >= now;
+    return expiresAt <= now;
   }, [connectionDetails?.participantToken]);
 
   const existingOrRefreshConnectionDetails = useCallback(async () => {
     if (isConnectionDetailsExpired() || !connectionDetails) {
       return fetchConnectionDetails();
-    } else {
-      return connectionDetails;
     }
+    return connectionDetails;
   }, [connectionDetails, fetchConnectionDetails, isConnectionDetailsExpired]);
 
   return {
