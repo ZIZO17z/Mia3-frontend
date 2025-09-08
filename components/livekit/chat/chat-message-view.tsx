@@ -1,6 +1,6 @@
 'use client';
 
-import { type RefObject, useEffect, useRef, useState } from 'react';
+import { type RefObject, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface UseAutoScrollOptions {

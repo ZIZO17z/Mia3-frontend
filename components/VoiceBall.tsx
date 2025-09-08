@@ -1,19 +1,15 @@
 // VoiceBall.tsx
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import type { HTMLAttributes } from 'react';
+import { type HTMLAttributes, useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 interface VoiceBallProps extends HTMLAttributes<HTMLDivElement> {
   isActive?: boolean;
 }
 
-export default function VoiceBall({
-  className = "",
-  isActive = false,
-  ...props
-}: VoiceBallProps) {
+export default function VoiceBall({ className = '', isActive = false, ...props }: VoiceBallProps) {
   const ballRef = useRef<HTMLDivElement>(null);
   const [audioLevel, setAudioLevel] = useState(0);
   const [isClient, setIsClient] = useState(false);
@@ -28,32 +24,29 @@ export default function VoiceBall({
     let audioContext: AudioContext | null = null;
     let analyser: AnalyserNode | null = null;
     let dataArray: Uint8Array;
-    let animationFrame: number;
-    let micStream: MediaStream | null = null;
 
     async function initMic() {
       try {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+        if (!navigator.mediaDevices?.getUserMedia) return;
 
-        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioContext = new (window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
         const source = audioContext.createMediaStreamSource(micStream);
 
         analyser = audioContext.createAnalyser();
-        analyser.fftSize = 128;
+        analyser.fftSize = 256;
         dataArray = new Uint8Array(analyser.frequencyBinCount);
 
         source.connect(analyser);
 
-        const update = () => {
+        function update() {
           if (!analyser) return;
-          analyser.getByteFrequencyData(dataArray);
-
+          analyser.getByteFrequencyData(dataArray as Uint8Array<ArrayBuffer>);
           const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
           setAudioLevel(avg * 1.5);
-
-          animationFrame = requestAnimationFrame(update);
-        };
+          requestAnimationFrame(update);
+        }
 
         update();
       } catch (err) {
@@ -64,9 +57,7 @@ export default function VoiceBall({
     initMic();
 
     return () => {
-      if (animationFrame) cancelAnimationFrame(animationFrame);
       if (audioContext) audioContext.close();
-      if (micStream) micStream.getTracks().forEach(track => track.stop());
     };
   }, [isClient]);
 
@@ -80,10 +71,9 @@ export default function VoiceBall({
     ballRef.current.style.boxShadow = [
       `0 0 ${glow}px rgba(0, 255, 200, 0.6)`,
       `0 0 ${glow * 1.2}px rgba(80, 200, 255, 0.4)`,
-      `0 0 ${glow * 1.6}px rgba(160, 180, 255, 0.3)`
+      `0 0 ${glow * 1.6}px rgba(160, 180, 255, 0.3)`,
     ].join(', ');
 
-    // Smooth aurora gradient for the ball
     ballRef.current.style.background = `radial-gradient(circle at center,
       #0D1B2A 0%,
       #1B263B 30%,
@@ -96,7 +86,7 @@ export default function VoiceBall({
   return (
     <div
       className={cn(
-        'fixed inset-0 flex items-center justify-center z-50 pointer-events-none',
+        'pointer-events-none fixed inset-0 z-50 flex items-center justify-center',
         className
       )}
       {...props}
@@ -104,26 +94,28 @@ export default function VoiceBall({
       <div
         ref={ballRef}
         className={cn(
-          "relative z-50 flex items-center justify-center w-56 h-56 rounded-full transition-transform duration-100 ease-out",
-          isActive ? "opacity-100" : "opacity-80"
+          'relative z-50 flex h-56 w-56 items-center justify-center rounded-full transition-transform duration-100 ease-out',
+          isActive ? 'opacity-100' : 'opacity-80'
         )}
       >
-        <img
+        <Image
           src="/lk-logo.svg"
           alt="Logo"
-          className="absolute left-1/2 top-1/2 w-28 h-28 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none"
+          width={112}
+          height={112}
+          className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none"
           style={{ zIndex: 60 }}
         />
       </div>
 
       {/* Soft Aura Layers */}
-      <div className="absolute w-72 h-72 rounded-full bg-teal-400/20 blur-2xl animate-pulse-slow z-40" />
-      <div className="absolute w-80 h-80 rounded-full bg-indigo-400/20 blur-3xl animate-pulse-slower z-40" />
-      <div className="absolute w-96 h-96 rounded-full bg-blue-300/10 blur-[100px] z-30" />
+      <div className="animate-pulse-slow absolute z-40 h-72 w-72 rounded-full bg-teal-400/20 blur-2xl" />
+      <div className="animate-pulse-slower absolute z-40 h-80 w-80 rounded-full bg-indigo-400/20 blur-3xl" />
+      <div className="absolute z-30 h-96 w-96 rounded-full bg-blue-300/10 blur-[100px]" />
 
       {/* Gentle Pulsing Ring */}
       {isActive && (
-        <div className="absolute inset-0 rounded-full border border-cyan-200/40 animate-ping z-40" />
+        <div className="absolute inset-0 z-40 animate-ping rounded-full border border-cyan-200/40" />
       )}
     </div>
   );

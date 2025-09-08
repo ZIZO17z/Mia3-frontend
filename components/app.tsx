@@ -1,17 +1,17 @@
 // app.tsx
 'use client';
-import { useEffect, useMemo, useState, useCallback } from 'react';
-import { Room, RoomEvent, LocalTrackPublication } from 'livekit-client';
-import { motion, AnimatePresence } from 'motion/react';
-import { RoomAudioRenderer, RoomContext, StartAudio, useRoomContext } from '@livekit/components-react';
+
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Room, RoomEvent } from 'livekit-client';
+import { AnimatePresence, motion } from 'motion/react';
+import { RoomAudioRenderer, RoomContext, StartAudio } from '@livekit/components-react';
+import VoiceBall from '@/components/VoiceBall';
 import { toastAlert } from '@/components/alert-toast';
 import { SessionView } from '@/components/session-view';
 import { Toaster } from '@/components/ui/sonner';
 import { Welcome } from '@/components/welcome';
-import VoiceBall from '@/components/VoiceBall';
 import useConnectionDetails from '@/hooks/useConnectionDetails';
 import type { AppConfig } from '@/lib/types';
-import { cn } from '@/lib/utils';
 
 const MotionWelcome = motion(Welcome);
 const MotionSessionView = motion(SessionView);
@@ -23,8 +23,9 @@ interface AppProps {
 export default function App({ appConfig }: AppProps) {
   const room = useMemo(() => new Room(), []);
   const [sessionStarted, setSessionStarted] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
-  const [audioLevel, setAudioLevel] = useState(0);
+  const [connectionStatus, setConnectionStatus] = useState<
+    'disconnected' | 'connecting' | 'connected'
+  >('disconnected');
   const { refreshConnectionDetails, existingOrRefreshConnectionDetails } =
     useConnectionDetails(appConfig);
 
@@ -32,7 +33,7 @@ export default function App({ appConfig }: AppProps) {
     try {
       setConnectionStatus('connecting');
       const connectionDetails = await existingOrRefreshConnectionDetails();
-      
+
       if (!connectionDetails) {
         throw new Error('Failed to get connection details');
       }
@@ -49,28 +50,21 @@ export default function App({ appConfig }: AppProps) {
     }
   }, [room, existingOrRefreshConnectionDetails]);
 
-  const endSession = useCallback(() => {
-    room.disconnect();
-    setSessionStarted(false);
-    setConnectionStatus('disconnected');
-    refreshConnectionDetails();
-  }, [room, refreshConnectionDetails]);
-
   useEffect(() => {
     const onDisconnected = () => {
       setSessionStarted(false);
       setConnectionStatus('disconnected');
       refreshConnectionDetails();
     };
-    
+
     const onConnected = () => {
       setConnectionStatus('connected');
     };
-    
+
     const onReconnecting = () => {
       setConnectionStatus('connecting');
     };
-    
+
     const onMediaDevicesError = (error: Error) => {
       toastAlert({
         title: 'Media devices error',
@@ -92,30 +86,9 @@ export default function App({ appConfig }: AppProps) {
     };
   }, [room, refreshConnectionDetails]);
 
-  useEffect(() => {
-    let audioLevelInterval: NodeJS.Timeout;
-    
-    if (connectionStatus === 'connected') {
-      audioLevelInterval = setInterval(() => {
-        const audioTracks = Array.from(room.localParticipant.audioTrackPublications.values());
-        const activeTrack = audioTracks.find(track => track.track && track.track.mediaStreamTrack.enabled);
-        
-        if (activeTrack && activeTrack.track) {
-          // Simulate audio level for visualization (in a real app, use actual audio levels)
-          const simulatedLevel = Math.random() * 100;
-          setAudioLevel(simulatedLevel);
-        }
-      }, 100);
-    }
-
-    return () => {
-      if (audioLevelInterval) clearInterval(audioLevelInterval);
-    };
-  }, [connectionStatus, room]);
-
   return (
     <RoomContext.Provider value={room}>
-      <div className="relative min-h-screen bg-background">
+      <div className="bg-background relative min-h-screen">
         <AnimatePresence mode="wait">
           {!sessionStarted ? (
             <MotionWelcome
@@ -145,10 +118,10 @@ export default function App({ appConfig }: AppProps) {
         </AnimatePresence>
 
         {connectionStatus === 'connecting' && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
             <div className="text-center">
               <VoiceBall className="mx-auto mb-6" />
-              <p className="text-lg font-medium text-foreground">Connecting to session...</p>
+              <p className="text-foreground text-lg font-medium">Connecting to session...</p>
             </div>
           </div>
         )}

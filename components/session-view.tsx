@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import {
   type AgentState,
@@ -87,8 +87,7 @@ export const SessionView = React.forwardRef<
     }
   }, [agentState, sessionStarted, room]);
 
-  const { supportsChatInput, supportsVideoInput, supportsScreenShare } =
-    appConfig;
+  const { supportsChatInput, supportsVideoInput, supportsScreenShare } = appConfig;
   const capabilities = { supportsChatInput, supportsVideoInput, supportsScreenShare };
 
   return (
@@ -96,8 +95,8 @@ export const SessionView = React.forwardRef<
       ref={ref}
       inert={disabled ? true : undefined}
       className={cn(
-        'relative min-h-screen bg-background',
-        disabled && 'opacity-50 pointer-events-none',
+        'bg-background relative min-h-screen',
+        disabled && 'pointer-events-none opacity-50',
         !chatOpen && 'max-h-screen overflow-hidden',
         className
       )}
@@ -107,9 +106,7 @@ export const SessionView = React.forwardRef<
       <ChatMessageView
         className={cn(
           'mx-auto min-h-screen w-full max-w-2xl px-4 pt-32 pb-40 transition-all duration-300 ease-out md:px-6 md:pt-36 md:pb-48',
-          chatOpen
-            ? 'translate-y-0 opacity-100 delay-200'
-            : 'translate-y-20 opacity-0'
+          chatOpen ? 'translate-y-0 opacity-100 delay-200' : 'translate-y-20 opacity-0'
         )}
       >
         <div className="space-y-4 whitespace-pre-wrap" aria-live="polite">
@@ -137,7 +134,7 @@ export const SessionView = React.forwardRef<
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.7 }}
-              className="text-center text-muted-foreground py-12"
+              className="text-muted-foreground py-12 text-center"
               role="status"
             >
               {sessionStarted ? (
@@ -154,7 +151,7 @@ export const SessionView = React.forwardRef<
       </ChatMessageView>
 
       {/* Top gradient overlay */}
-      <div className="bg-background fixed top-0 right-0 left-0 h-32 md:h-36 z-10">
+      <div className="bg-background fixed top-0 right-0 left-0 z-10 h-32 md:h-36">
         <div className="from-background absolute bottom-0 left-0 h-12 w-full translate-y-full bg-gradient-to-b to-transparent" />
       </div>
 
@@ -191,12 +188,10 @@ export const SessionView = React.forwardRef<
                 aria-hidden={messages.length > 0}
                 className={cn(
                   'absolute inset-x-0 -top-12 text-center',
-                  sessionStarted &&
-                    messages.length === 0 &&
-                    'pointer-events-none'
+                  sessionStarted && messages.length === 0 && 'pointer-events-none'
                 )}
               >
-                <p className="animate-text-shimmer inline-block bg-clip-text text-sm font-semibold text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+                <p className="animate-text-shimmer inline-block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-sm font-semibold text-transparent">
                   Agent is listening, ask it a question…
                 </p>
               </motion.div>

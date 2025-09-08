@@ -3,9 +3,14 @@
 
 import { ReactNode } from 'react';
 import { toast as sonnerToast } from 'sonner';
-import { WarningIcon, InfoIcon, CheckCircleIcon, XCircleIcon } from '@phosphor-icons/react/dist/ssr';
-import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import {
+  CheckCircleIcon,
+  InfoIcon,
+  WarningIcon,
+  XCircleIcon,
+} from '@phosphor-icons/react/dist/ssr';
 import { cn } from '@/lib/utils';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 interface ToastProps {
   id: string | number;
@@ -15,10 +20,9 @@ interface ToastProps {
 }
 
 export function toastAlert(toast: Omit<ToastProps, 'id'>) {
-  return sonnerToast.custom(
-    (id) => <AlertToast id={id} {...toast} />,
-    { duration: toast.variant === 'destructive' ? 15_000 : 10_000 }
-  );
+  return sonnerToast.custom((id) => <AlertToast id={id} {...toast} />, {
+    duration: toast.variant === 'destructive' ? 15_000 : 10_000,
+  });
 }
 
 export function toastSuccess(toast: Omit<ToastProps, 'id' | 'variant'>) {
@@ -65,7 +69,7 @@ function AlertToast(props: ToastProps) {
   return (
     <Alert
       className={cn(
-        'w-full max-w-md shadow-lg backdrop-blur-sm border',
+        'w-full max-w-md border shadow-lg backdrop-blur-sm',
         getVariantClass(),
         'animate-in slide-in-from-bottom-4 duration-300 ease-out'
       )}
@@ -73,20 +77,19 @@ function AlertToast(props: ToastProps) {
       <div className="flex gap-3">
         <div className="flex-shrink-0 pt-0.5">{getIcon()}</div>
         <div className="flex-1 space-y-1">
-          <AlertTitle className="text-sm font-medium leading-none">{title}</AlertTitle>
+          <AlertTitle className="text-sm leading-none font-medium">{title}</AlertTitle>
           {description && (
-            <AlertDescription className="text-sm text-muted-foreground">
+            <AlertDescription className="text-muted-foreground text-sm">
               {description}
             </AlertDescription>
           )}
         </div>
         <button
           onClick={() => sonnerToast.dismiss(id)}
-          className="flex-shrink-0 size-4 rounded opacity-70 hover:opacity-100 transition-opacity mt-0.5 text-lg font-bold"
+          className="mt-0.5 size-4 flex-shrink-0 rounded text-lg font-bold opacity-70 transition-opacity hover:opacity-100"
           aria-label="Dismiss"
         >
-          <span className="sr-only">Close</span>
-          ×
+          <span className="sr-only">Close</span>×
         </button>
       </div>
     </Alert>

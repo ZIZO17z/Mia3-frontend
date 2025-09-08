@@ -1,21 +1,24 @@
-import { useState, useEffect } from 'react';
-import { Participant, Room, Track } from 'livekit-client';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Participant, Track } from 'livekit-client';
+import { useRoomContext } from '@livekit/components-react';
 import { AgentControlBar } from '@/components/livekit/agent-control-bar/agent-control-bar';
 import { DeviceSelect } from '@/components/livekit/device-select';
 import { TrackToggle } from '@/components/livekit/track-toggle';
 import { Container } from '../Container';
 
-interface LiveKitProps {
-  room: Room;
-}
-
-export default function LiveKit({ room }: LiveKitProps) {
+export default function LiveKit() {
+  const room = useRoomContext();
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
 
   useEffect(() => {
     const updateParticipants = () => {
-      const allParticipants = [room.localParticipant, ...Array.from(room.remoteParticipants.values())];
+      const allParticipants = [
+        room.localParticipant,
+        ...Array.from(room.remoteParticipants.values()),
+      ];
       setParticipants(allParticipants);
     };
 
@@ -30,62 +33,60 @@ export default function LiveKit({ room }: LiveKitProps) {
   }, [room]);
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-start bg-gradient-to-br from-[#0A0A2A] via-[#1C1C3D] to-[#3C1361] py-6">
+    <div className="flex min-h-screen w-full flex-col items-center justify-start bg-gradient-to-br from-[#0A0A2A] via-[#1C1C3D] to-[#3C1361] py-6">
       {/* Device Selection */}
-      <Container className="max-w-5xl w-full mb-6 glass rounded-2xl shadow-lg border border-[#23234d]/30 backdrop-blur-md p-6">
-        <h3 className="text-[#E0F0FF] text-lg font-semibold mb-4">Device Selection</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <Container className="glass mb-6 w-full max-w-5xl rounded-2xl border border-[#23234d]/30 p-6 shadow-lg backdrop-blur-md">
+        <h3 className="mb-4 text-lg font-semibold text-[#E0F0FF]">Device Selection</h3>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <DeviceSelect kind="audioinput" />
           <DeviceSelect kind="videoinput" />
         </div>
       </Container>
 
-      {/* Track Toggles */}
-      <Container className="max-w-5xl w-full mb-6 glass rounded-2xl shadow-lg border border-[#23234d]/30 backdrop-blur-md p-6">
-        <h3 className="text-[#E0F0FF] text-lg font-semibold mb-4">Track Controls</h3>
-        <div className="flex gap-6 flex-wrap">
+      {/* Track Controls */}
+      <Container className="glass mb-6 w-full max-w-5xl rounded-2xl border border-[#23234d]/30 p-6 shadow-lg backdrop-blur-md">
+        <h3 className="mb-4 text-lg font-semibold text-[#E0F0FF]">Track Controls</h3>
+        <div className="flex flex-wrap gap-6">
           <TrackToggle variant="outline" source={Track.Source.Microphone} />
           <TrackToggle variant="outline" source={Track.Source.Camera} />
         </div>
       </Container>
 
       {/* Video Grid */}
-      <Container className="max-w-7xl w-full mb-6 glass rounded-3xl shadow-2xl border border-[#23234d]/30 backdrop-blur-lg p-6">
-        <h3 className="text-[#E0F0FF] text-xl font-bold mb-6">Video Call</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <Container className="glass mb-6 w-full max-w-7xl rounded-3xl border border-[#23234d]/30 p-6 shadow-2xl backdrop-blur-lg">
+        <h3 className="mb-6 text-xl font-bold text-[#E0F0FF]">Video Call</h3>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {participants.map((p) => (
             <div
               key={p.sid}
-              className={`relative group rounded-2xl overflow-hidden shadow-xl border-2 transition-transform duration-300 cursor-pointer
-                ${activeVideo === p.sid ? 'scale-110 border-[#A8335E]/80 z-50 shadow-2xl' : 'scale-100 border-[#3C1361]/40'}
-                bg-gradient-to-br from-[#23234d]/70 to-[#3C1361]/50`}
+              className={`group relative cursor-pointer overflow-hidden rounded-2xl border-2 shadow-xl transition-transform duration-300 ${activeVideo === p.sid ? 'z-50 scale-110 border-[#A8335E]/80 shadow-2xl' : 'scale-100 border-[#3C1361]/40'} bg-gradient-to-br from-[#23234d]/70 to-[#3C1361]/50`}
               onClick={() => setActiveVideo(activeVideo === p.sid ? null : p.sid)}
             >
               <video
                 autoPlay
                 playsInline
                 muted={p.isLocal}
-                className="w-full h-64 sm:h-72 md:h-80 lg:h-96 object-cover rounded-2xl transition-transform duration-300"
+                className="h-64 w-full rounded-2xl object-cover transition-transform duration-300 sm:h-72 md:h-80 lg:h-96"
                 ref={(el) => {
                   if (el) {
-                    const videoTrackPub = p.getTrackPublications().find(
-                      (t) => t.track && t.track.kind === 'video'
-                    );
+                    const videoTrackPub = p
+                      .getTrackPublications()
+                      .find((t) => t.track && t.track.kind === 'video');
                     if (videoTrackPub && videoTrackPub.track) {
                       videoTrackPub.track.attach(el);
                     }
                   }
                 }}
               />
-              {/* Active Overlay */}
               {activeVideo === p.sid && (
-                <div className="absolute inset-0 border-4 border-[#A8335E] rounded-2xl shadow-[0_0_40px_#A8335E80] animate-pulse pointer-events-none"></div>
+                <div className="pointer-events-none absolute inset-0 animate-pulse rounded-2xl border-4 border-[#A8335E] shadow-[0_0_40px_#A8335E80]"></div>
               )}
-              {/* Participant Info */}
-              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between bg-black/50 px-3 py-1 rounded-xl text-xs text-[#E0F0FF] shadow-md">
-                <span className="font-semibold truncate">{p.identity}</span>
+              <div className="absolute right-2 bottom-2 left-2 flex items-center justify-between rounded-xl bg-black/50 px-3 py-1 text-xs text-[#E0F0FF] shadow-md">
+                <span className="truncate font-semibold">{p.identity}</span>
                 {p.isLocal && (
-                  <span className="ml-2 px-2 py-0.5 rounded bg-[#A8335E]/80 text-white text-[10px]">You</span>
+                  <span className="ml-2 rounded bg-[#A8335E]/80 px-2 py-0.5 text-[10px] text-white">
+                    You
+                  </span>
                 )}
               </div>
             </div>
@@ -94,7 +95,7 @@ export default function LiveKit({ room }: LiveKitProps) {
       </Container>
 
       {/* Agent Control Bar */}
-      <Container className="max-w-5xl w-full mb-8 glass rounded-2xl shadow-lg border border-[#23234d]/30 backdrop-blur-md p-4">
+      <Container className="glass mb-8 w-full max-w-5xl rounded-2xl border border-[#23234d]/30 p-4 shadow-lg backdrop-blur-md">
         <AgentControlBar
           className="w-full"
           capabilities={{

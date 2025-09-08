@@ -5,7 +5,6 @@ import { APP_CONFIG_DEFAULTS } from '@/app-config';
 import { ApplyThemeScript, ThemeToggle } from '@/components/theme-toggle';
 import { getAppConfig } from '@/lib/utils';
 import './globals.css';
-import VoiceBall from '@/components/VoiceBall';
 
 const publicSans = Public_Sans({
   variable: '--font-public-sans',
@@ -37,7 +36,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     process.env.NODE_ENV === 'development' || accentDark !== APP_CONFIG_DEFAULTS.accentDark
       ? `.dark { --primary: ${accentDark}; --primary-hover: color-mix(in srgb, ${accentDark} 80%, #000); }`
       : '',
-  ].filter(Boolean).join('\n');
+  ]
+    .filter(Boolean)
+    .join('\n');
 
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
@@ -48,9 +49,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         <ApplyThemeScript />
       </head>
       <body
-        className={`${publicSans.variable} ${commitMono.variable} overflow-x-hidden antialiased bg-jarvis`}
+        className={`${publicSans.variable} ${commitMono.variable} bg-jarvis overflow-x-hidden antialiased`}
       >
-    
         {children}
         <div className="group fixed bottom-0 left-1/2 z-50 mb-2 -translate-x-1/2">
           <ThemeToggle className="translate-y-20 transition-transform delay-150 duration-300 group-hover:translate-y-0" />

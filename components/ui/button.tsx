@@ -41,13 +41,8 @@ const buttonVariants = cva(
           'bg-secondary text-secondary-foreground shadow-sm rounded-lg',
           'hover:bg-secondary/80 focus:bg-secondary/70 hover:shadow-md',
         ],
-        ghost: [
-          'hover:bg-accent hover:text-accent-foreground',
-          'dark:hover:bg-accent/50',
-        ],
-        link: [
-          'text-primary underline-offset-4 hover:underline',
-        ],
+        ghost: ['hover:bg-accent hover:text-accent-foreground', 'dark:hover:bg-accent/50'],
+        link: ['text-primary underline-offset-4 hover:underline'],
       },
       size: {
         default: 'h-10 px-4 py-2 text-sm font-semibold has-[>svg]:px-3',
@@ -63,9 +58,7 @@ const buttonVariants = cva(
   }
 );
 
-interface ButtonProps
-  extends React.ComponentProps<'button'>,
-    VariantProps<typeof buttonVariants> {
+interface ButtonProps extends React.ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 

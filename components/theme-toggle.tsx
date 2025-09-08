@@ -3,15 +3,10 @@
 
 import { useEffect, useState } from 'react';
 import { MonitorIcon, MoonIcon, SunIcon } from '@phosphor-icons/react';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { ThemeMode } from '@/lib/types';
 import { THEME_MEDIA_QUERY, THEME_STORAGE_KEY, cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 
 const THEME_SCRIPT = `
   (function() {
@@ -82,8 +77,7 @@ export function ThemeToggle({
 
   useEffect(() => {
     setMounted(true);
-    const storedTheme =
-      (localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode) ?? 'system';
+    const storedTheme = (localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode) ?? 'system';
     setTheme(storedTheme);
   }, []);
 
@@ -137,7 +131,7 @@ export function ThemeToggle({
                 onClick={() => handleThemeChange(value)}
                 className={cn(
                   theme !== value && 'text-muted-foreground',
-                  'relative transition-all duration-300 ease-in-out focus-visible:ring-2 focus-visible:ring-primary'
+                  'focus-visible:ring-primary relative transition-all duration-300 ease-in-out focus-visible:ring-2'
                 )}
                 aria-pressed={theme === value}
                 aria-label={label}
@@ -147,17 +141,15 @@ export function ThemeToggle({
                   weight="bold"
                   className={cn(
                     theme === value
-                      ? 'scale-125 rotate-6 text-primary drop-shadow-glow'
+                      ? 'text-primary drop-shadow-glow scale-125 rotate-6'
                       : 'scale-100 opacity-75',
                     'transition-transform duration-300 ease-in-out'
                   )}
                 />
-                {showLabels && (
-                  <span className="ml-2 text-xs font-medium">{label}</span>
-                )}
+                {showLabels && <span className="ml-2 text-xs font-medium">{label}</span>}
                 {/* subtle glow effect when active */}
                 {theme === value && (
-                  <span className="absolute inset-0 rounded-md ring-2 ring-primary/40 animate-pulse pointer-events-none" />
+                  <span className="ring-primary/40 pointer-events-none absolute inset-0 animate-pulse rounded-md ring-2" />
                 )}
               </Button>
             </TooltipTrigger>

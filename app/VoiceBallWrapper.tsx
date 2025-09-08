@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import VoiceBall from "@/components/VoiceBall";
+import VoiceBall from '@/components/VoiceBall';
 
 export default function VoiceBallWrapper() {
   return <VoiceBall />;

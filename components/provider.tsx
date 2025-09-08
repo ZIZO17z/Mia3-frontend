@@ -25,15 +25,16 @@ export function Provider({
           await room.localParticipant.setMicrophoneEnabled(true, undefined, {
             preConnectBuffer: true,
           });
-          
+
           await room.connect(connectionDetails.serverUrl, connectionDetails.participantToken);
         } catch (error) {
           console.error('Connection error:', error);
           toastAlert({
             title: 'Connection failed',
-            description: error instanceof Error 
-              ? `${error.name}: ${error.message}` 
-              : 'Unknown error occurred while connecting to the agent',
+            description:
+              error instanceof Error
+                ? `${error.name}: ${error.message}`
+                : 'Unknown error occurred while connecting to the agent',
           });
         }
       };
