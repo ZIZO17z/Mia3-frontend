@@ -1,7 +1,6 @@
 // app.tsx
 'use client';
 
-// app.tsx
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Room, RoomEvent } from 'livekit-client';
 import { AnimatePresence, motion } from 'motion/react';
@@ -13,8 +12,6 @@ import { Toaster } from '@/components/ui/sonner';
 import { Welcome } from '@/components/welcome';
 import useConnectionDetails from '@/hooks/useConnectionDetails';
 import type { AppConfig } from '@/lib/types';
-
-// app.tsx
 
 // app.tsx
 

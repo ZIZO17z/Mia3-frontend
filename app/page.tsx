@@ -1,12 +1,17 @@
-import { headers } from 'next/headers';
+'use client';
+
+import { useEffect, useState } from 'react';
 import App from '@/components/app';
-import { getAppConfig } from '@/lib/utils';
+import { APP_CONFIG_DEFAULTS } from '@/app-config';
+import type { AppConfig } from '@/lib/types';
 
-export const dynamic = 'force-dynamic';
+export default function HomePage() {
+  const [appConfig, setAppConfig] = useState<AppConfig>(APP_CONFIG_DEFAULTS);
 
-export default async function HomePage() {
-  const hdrs = await headers();
-  const appConfig = await getAppConfig(hdrs);
+  useEffect(() => {
+    // Load app config on client side to avoid SSR issues
+    setAppConfig(APP_CONFIG_DEFAULTS);
+  }, []);
 
   return <App appConfig={appConfig} />;
 }
