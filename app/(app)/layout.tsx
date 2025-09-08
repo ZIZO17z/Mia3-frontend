@@ -1,8 +1,9 @@
-export const dynamic = 'force-static';
 import { headers } from 'next/headers';
 import Image from 'next/image';
 import VoiceBall from '@/components/VoiceBall';
 import { getAppConfig } from '@/lib/utils';
+
+export const dynamic = 'force-static';
 
 interface AppLayoutProps {
   children: React.ReactNode;

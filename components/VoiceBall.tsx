@@ -1,4 +1,5 @@
 // VoiceBall.tsx
+
 'use client';
 
 import { type HTMLAttributes, useEffect, useRef, useState } from 'react';

@@ -55,9 +55,7 @@ export default function useConnectionDetails(appConfig: AppConfig) {
       return data;
     } catch (error) {
       console.error('Error fetching connection details:', error);
-      throw error instanceof Error
-        ? error
-        : new Error('Error fetching connection details!');
+      throw error instanceof Error ? error : new Error('Error fetching connection details!');
     }
   }, [appConfig.agentName, appConfig.sandboxId]);
 

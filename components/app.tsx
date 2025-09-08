@@ -1,6 +1,7 @@
 // app.tsx
 'use client';
 
+// app.tsx
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Room, RoomEvent } from 'livekit-client';
 import { AnimatePresence, motion } from 'motion/react';
