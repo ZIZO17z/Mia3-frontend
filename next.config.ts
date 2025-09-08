@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+  // Removed output: 'export' to allow server-side features
 };
 
 export default nextConfig;

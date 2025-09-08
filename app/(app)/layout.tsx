@@ -1,3 +1,4 @@
+export const dynamic = 'force-static';
 import { headers } from 'next/headers';
 import Image from 'next/image';
 import VoiceBall from '@/components/VoiceBall';

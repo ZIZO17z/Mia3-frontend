@@ -8,6 +8,9 @@ import { join } from 'node:path';
 import { APP_CONFIG_DEFAULTS } from '@/app-config';
 import { getAppConfig } from '@/lib/utils';
 
+// Force dynamic rendering for this route
+export const dynamic = 'force-dynamic';
+
 type Dimensions = {
   width: number;
   height: number;
